@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomElements Demo</title>
+    <style>
+        .userInfo {
+            color: rgb(103, 103, 232);
+        }
+    </style>
+</head>
+<body>
+<p>This is a custom element by using tag "user-info"</p>
+<user-info name="Rickie" class="userInfo"></user-info>
+<p>This is an input element and it's using "is" attribute to define a custom element</p>
+<input type="text" is="my-h1">
+<script>
+    // We need to extend HTMLElement to create a custom element
+    class UserInfo extends HTMLElement {
+        constructor() {
+            // need to use super in constructor
+            super();
+            // using attatchShadow to attatch a shadow DOM tree
+            // and get a reference to shadow root
+            const shadow = this.attachShadow({mode: 'open'});
+
+            const info = document.createElement('span');
+            info.setAttribute('class', 'info');
+
+            // get name attribute from custom element
+            info.textContent = this.getAttribute('name');
+
+
+            // Using style tag to add style
+            const style = document.createElement('style');
+            style.textContent = `
+        .info {
+          font-size: 80px;
+          padding: 10px;
+          background: #333;
+          border-radius: 10px;
+        }
+      `;
+            // add element to shadow DOM
+            shadow.appendChild(style);
+            shadow.appendChild(info);
+        }
+    }
+
+    customElements.define('user-info', UserInfo);
+
+    // Define an element that extends from the native input
+    class MyH1 extends HTMLInputElement {
+        constructor() {
+            super()
+            this.value = 'This is a custom input extended from original input'
+            this.style.minWidth = '500px'
+            this.style.padding = '5px 10px'
+            this.style.border = '1px solid red'
+            this.style.borderRadius = '5px'
+        }
+    }
+
+    // When using "customElements.define" to register custom element,
+    // the third parameter passing to is intended to be used for extending native elements,
+    // in this case, we extend the native input element.
+    customElements.define('my-h1', MyH1, {extends: "input"});
+</script>
+</body>
+</html>
