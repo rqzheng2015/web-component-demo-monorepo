@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomElements Demo</title>
+</head>
+<body>
+<div>
+    <button class="add">add</button>
+    <button class="pink">200px pink</button>
+    <button class="black">100px black</button>
+    <button class="remove">remove</button>
+</div>
+<script>
+    class Square extends HTMLElement {
+        static get observedAttributes() {
+            return ['size', 'color'];
+        }
+
+        constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+            const div = document.createElement('div');
+            const style = document.createElement('style');
+            shadow.appendChild(style);
+            shadow.appendChild(div);
+        }
+
+        connectedCallback() {
+            console.log('Element is connected into DOM');
+            const shadow = this.shadowRoot;
+            shadow.querySelector('style').textContent = `
+      div {
+        width: ${this.getAttribute('size')}px;
+        height: ${this.getAttribute('size')}px;
+        background-color: ${this.getAttribute('color')};
+      }
+    `;
+        }
+
+        disconnectedCallback() {
+            console.log('Element is disconnected');
+        }
+
+        adoptedCallback() {
+            console.log('Element was moved to new page');
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            console.log('The element is changing attribute(s).');
+            const shadow = this.shadowRoot;
+            shadow.querySelector('style').textContent = `
+      div {
+        width: ${this.getAttribute('size')}px;
+        height: ${this.getAttribute('size')}px;
+        background-color: ${this.getAttribute('color')};
+      }
+    `;
+        }
+    }
+    customElements.define('custom-square', Square);
+
+    const add = document.querySelector('.add');
+    const pink = document.querySelector('.pink');
+    const black = document.querySelector('.black');
+    const remove = document.querySelector('.remove');
+    let square = document.querySelector('custom-square');
+
+    add.onclick = function () {
+        square = document.createElement('custom-square')
+        square.setAttribute('size', '50');
+        square.setAttribute('color', 'yellow')
+        document.body.appendChild(square);
+    };
+
+    pink.onclick = function () {
+        square.setAttribute('size', '200');
+        square.setAttribute('color', 'pink');
+    };
+
+    black.onclick = function () {
+        square.setAttribute('size', '100');
+        square.setAttribute('color', 'black');
+    };
+
+    remove.onclick = function () {
+        square.remove()
+    };
+
+</script>
+</body>
+</html>
